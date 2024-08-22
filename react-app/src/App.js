@@ -5,17 +5,18 @@ function App() {
   const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    fetch('/time').then(res => res.json()).then(data => {
-      console.log(data);
-    });
+    fetch('/api/time')
+      .then(res => res.json())
+      .then(data => {
+        setCurrentTime(data.time);
+      })
+      .catch(err => console.error('Error fetching time:', err));
   }, []);
 
   return (
     <div className="App">
       <header className="App-header">
-
-        ... no changes in this part ...
-
+        {/* ... no changes in this part ... */}
         <p>The current time is {currentTime}.</p>
       </header>
     </div>
