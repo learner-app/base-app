@@ -1,17 +1,8 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from src import create_app, db
 
-app = Flask(__name__)
-
-# Configure the database URI
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test_database.db"
-
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# Initialize SQLAlchemy
-db = SQLAlchemy(app)
-
-# Your routes and other app code here
+app = create_app()
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
