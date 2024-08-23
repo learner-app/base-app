@@ -29,6 +29,9 @@ class Deck(db.Model):
     # Relationships
     user = db.relationship("User", back_populates="decks")
     terms = db.relationship("Term", back_populates="deck", lazy="dynamic")
+    generated_sentences = db.relationship(
+        "GeneratedSentence", back_populates="deck", lazy="dynamic"
+    )
 
     def __repr__(self):
         return f"<Deck {self.deck_name}>"
@@ -48,3 +51,42 @@ class Term(db.Model):
 
     def __repr__(self):
         return f"<Term {self.term}>"
+
+
+class GeneratedSentence(db.Model):
+    __tablename__ = "generated_sentences"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    deck_id = db.Column(db.Integer, db.ForeignKey("decks.deck_id"), nullable=False)
+    sentence = db.Column(db.Text, nullable=False)
+    machine_translation = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship
+    deck = db.relationship("Deck", back_populates="generated_sentences")
+    user_translations = db.relationship(
+        "UserTranslation", back_populates="generated_sentence", lazy="dynamic"
+    )
+
+    def __repr__(self):
+        return f"<GeneratedSentence {self.sentence[:20]}...>"
+
+
+class UserTranslation(db.Model):
+    __tablename__ = "user_translations"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    generated_sentence_id = db.Column(
+        db.Integer, db.ForeignKey("generated_sentences.id"), nullable=False
+    )
+    user_translation = db.Column(db.Text)
+    evaluation_result = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship
+    generated_sentence = db.relationship(
+        "GeneratedSentence", back_populates="user_translations"
+    )
+
+    def __repr__(self):
+        return f"<UserTranslation {self.user_translation[:20]}...>"

@@ -26,6 +26,28 @@ CREATE TABLE terms (
     FOREIGN KEY (deck_id) REFERENCES decks(deck_id)
 );
 
--- Index for faster lookups
+-- GeneratedSentences table
+CREATE TABLE generated_sentences (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    deck_id INTEGER NOT NULL,
+    sentence TEXT NOT NULL,
+    machine_translation TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (deck_id) REFERENCES decks(deck_id)
+);
+
+-- UserTranslations table
+CREATE TABLE user_translations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    generated_sentence_id INTEGER NOT NULL,
+    user_translation TEXT,
+    evaluation_result TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (generated_sentence_id) REFERENCES generated_sentences(id)
+);
+
+-- Indexes for faster lookups
+CREATE INDEX idx_generated_sentence_deck ON generated_sentences(deck_id);
+CREATE INDEX idx_user_translation_sentence ON user_translations(generated_sentence_id);
 CREATE INDEX idx_deck_user ON decks(user_id);
 CREATE INDEX idx_term_deck ON terms(deck_id);

@@ -19,10 +19,18 @@ def generate_sentences(deck_id):
         return jsonify({"error": "No terms found in this deck"}), 400
 
     # Prepare the prompt
-    prompt = "Please create a sentence for each of the following terms, using their definitions. Here are the terms and definitions:\n\n"
+    prompt = "Here is a list of terms and their definitions."
     for term in terms:
         prompt += f"Term: {term.term}\nDefinition: {term.definition}\n\n"
-    prompt += "Please provide a sentence for each term that demonstrates its usage based on the given definition."
+    prompt += "Please create 6 example coherent and meaningful sentences that demonstrate the usage of the given terms, according to their corresponding definitions.\n"
+    prompt += "Please refrain from using complicated vocabulary and grammar that is not inside the list of terms. It is okay to assume very basic knowledge of vocabulary and grammar of the language."
+    prompt += "If there are grammatical terms (such as tense & phrases) in the list, use them slightly more often than other vocabulary."
+    prompt += "Ensure that the sentences generated make logical sense and are actually useful for everyday conversation or scenarios."
+    prompt += "Your goal is to map these sentences to their translations in English in the following format:\n"
+    prompt += (
+        "Sentence: {example sentence}\nTranslation: {corresponding translation}\n\n"
+    )
+    prompt += "ONLY PROVIDE the sentences and translations strictly in the above format and NOTHING ELSE."
 
     try:
         # Call Anthropic API
@@ -45,31 +53,22 @@ def generate_sentences(deck_id):
         # Extract the generated sentences
         generated_text = message.content[0].text
 
-        # Process the generated text to pair terms with sentences
-        lines = generated_text.split("\n")
-        results = []
-        current_term = None
-        current_sentence = ""
-        for line in lines:
-            if line.startswith("Term:"):
-                if current_term:
-                    results.append(
-                        {"term": current_term, "sentence": current_sentence.strip()}
-                    )
-                current_term = line.split(":", 1)[1].strip()
-                current_sentence = ""
-            elif line.strip() and current_term:
-                current_sentence += line + " "
-        if current_term:
-            results.append({"term": current_term, "sentence": current_sentence.strip()})
+        sentences = []
+        for entry in generated_text.split("\n\n"):
+            if "Sentence:" in entry and "Translation:" in entry:
+                sentence = entry.split("Sentence:")[1].split("Translation:")[0].strip()
+                translation = entry.split("Translation:")[1].strip()
+                sentences.append({"sentence": sentence, "translation": translation})
 
-        return jsonify(
+        returnJson = jsonify(
             {
                 "deck_id": deck_id,
                 "deck_name": deck.deck_name,
-                "generated_sentences": results,
+                "generated_sentences": sentences,
             }
         )
+
+        return returnJson
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

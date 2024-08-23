@@ -1,0 +1,74 @@
+.sentence-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .back-button:hover {
+    text-decoration: underline;
+  }
+  
+  .page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .sentence-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sentence-item {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .term {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .sentence {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .generate-button {
+    display: block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .generate-button:hover {
+    background-color: #2563eb;
+  }
+  
+  .loading, .error {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 40px;
+  }
+  
+  .error {
+    color: #ef4444;
+  }

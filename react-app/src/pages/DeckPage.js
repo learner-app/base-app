@@ -88,6 +88,7 @@ export default function DeckPage() {
   return (
     <div className="deck-page">
       <Link to="/" className="back-button">← Back to Decks</Link>
+      <Link to={`/deck/${deckId}/sentences`} className="generate-sentences-link">Generate Sentences</Link>
       <h1 className="deck-title">{deck.deck_name}</h1>
       <p className="deck-info">
         {deck.terms.length} terms | {deck.is_public ? 'Public' : 'Private'}
