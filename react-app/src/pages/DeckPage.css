@@ -6,7 +6,7 @@
   
   .back-button {
     display: inline-block;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     color: #4a5568;
     text-decoration: none;
     font-size: 16px;
@@ -15,10 +15,23 @@
   .back-button:hover {
     text-decoration: underline;
   }
+
+  .generate-sentences-link {
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 16px;
+    margin-left: 30px;
+    margin-bottom: 0;
+  }
+
+  .generate-sentences-link:hover {
+    text-decoration: underline;
+  }
   
   .deck-title {
     font-size: 24px;
     font-weight: bold;
+    margin-top: 0px;
     margin-bottom: 10px;
   }
   

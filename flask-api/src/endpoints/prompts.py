@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from src import db
-from src.models import Deck, Term
+from src.models import Deck, GeneratedSentence, Term
 from anthropic import Anthropic
 import os
 
@@ -59,6 +59,15 @@ def generate_sentences(deck_id):
                 sentence = entry.split("Sentence:")[1].split("Translation:")[0].strip()
                 translation = entry.split("Translation:")[1].strip()
                 sentences.append({"sentence": sentence, "translation": translation})
+
+        for sentence in sentences:
+            new_sentence = GeneratedSentence(
+                deck_id=deck_id,
+                sentence=sentence["sentence"],
+                machine_translation=sentence["translation"],
+            )
+            db.session.add(new_sentence)
+            db.session.commit()
 
         returnJson = jsonify(
             {
