@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from src import db
 from src.models import Deck, Term
-from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+from anthropic import Anthropic
 import os
 
 prompts_bp = Blueprint("prompts", __name__)
@@ -19,20 +19,31 @@ def generate_sentences(deck_id):
         return jsonify({"error": "No terms found in this deck"}), 400
 
     # Prepare the prompt
-    prompt = f"{HUMAN_PROMPT} Please create a sentence for each of the following terms, using their definitions. Here are the terms and definitions:\n\n"
+    prompt = "Please create a sentence for each of the following terms, using their definitions. Here are the terms and definitions:\n\n"
     for term in terms:
         prompt += f"Term: {term.term}\nDefinition: {term.definition}\n\n"
-    prompt += "Please provide a sentence for each term that demonstrates its usage based on the given definition.\n"
-    prompt += f"{AI_PROMPT} Certainly! I'd be happy to create sentences for each term using their definitions. Here are the sentences:\n\n"
+    prompt += "Please provide a sentence for each term that demonstrates its usage based on the given definition."
 
     try:
         # Call Anthropic API
-        completion = anthropic.completions.create(
-            model="claude-2", max_tokens_to_sample=1000, prompt=prompt
+        message = anthropic.messages.create(
+            model="claude-3-5-sonnet-20240620",
+            max_tokens=1000,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt,
+                        }
+                    ],
+                }
+            ],
         )
 
         # Extract the generated sentences
-        generated_text = completion.completion
+        generated_text = message.content[0].text
 
         # Process the generated text to pair terms with sentences
         lines = generated_text.split("\n")
