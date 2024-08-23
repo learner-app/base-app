@@ -1,0 +1,164 @@
+.deck-list-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.deck-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.deck-list-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.sort-button {
+    padding: 10px 15px;
+    background-color: #e5e7eb;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sort-button:hover {
+    background-color: #d1d5db;
+}
+
+
+.deck-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.deck-item {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: box-shadow 0.3s ease;
+}
+
+.deck-item:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.deck-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.deck-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.deck-info {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.deck-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.deck-name a:hover {
+    color: #4a5568;
+    text-decoration: underline;
+}
+
+.delete-button {
+    background-color: #fee2e2;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #fecaca;
+}
+
+.loading, .error {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 40px;
+}
+
+.error {
+    color: #ef4444;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.confirm-delete {
+    background-color: #ef4444;
+    color: white;
+}
+
+.cancel-delete {
+    background-color: #6b7280;
+    color: white;
+}
+
+.confirm-delete:hover {
+    background-color: #dc2626;
+}
+
+.cancel-delete:hover {
+    background-color: #4b5563;
+}

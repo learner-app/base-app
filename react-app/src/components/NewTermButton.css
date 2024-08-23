@@ -1,0 +1,117 @@
+.new-term-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+  
+.new-term-button:hover {
+    background-color: #e5e7eb;
+}
+  
+.new-term-button svg {
+    margin-right: 8px;
+}
+  
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.modal-content {
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 425px;
+}
+  
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+  
+.form-group {
+    margin-bottom: 16px;
+}
+  
+.form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+  
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+}
+  
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
+}
+  
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+  
+.submit-button,
+.cancel-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+  
+.submit-button {
+    background-color: #3b82f6;
+    color: white;
+}
+  
+.submit-button:hover {
+    background-color: #2563eb;
+}
+  
+.cancel-button {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+  
+.cancel-button:hover {
+    background-color: #d1d5db;
+}
+  
+.submit-button,
+.cancel-button {
+    width: 48%;
+}
+
+.success-message {
+    color: green;
+    margin-bottom: 10px;
+}

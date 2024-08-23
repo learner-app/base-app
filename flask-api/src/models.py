@@ -1,0 +1,50 @@
+from src import db
+from datetime import datetime
+
+
+class User(db.Model):
+    __tablename__ = "users"
+
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship
+    decks = db.relationship("Deck", back_populates="user", lazy="dynamic")
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+
+class Deck(db.Model):
+    __tablename__ = "decks"
+
+    deck_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    deck_name = db.Column(db.String, nullable=False)
+    is_public = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship("User", back_populates="decks")
+    terms = db.relationship("Term", back_populates="deck", lazy="dynamic")
+
+    def __repr__(self):
+        return f"<Deck {self.deck_name}>"
+
+
+class Term(db.Model):
+    __tablename__ = "terms"
+
+    term_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    deck_id = db.Column(db.Integer, db.ForeignKey("decks.deck_id"), nullable=False)
+    term = db.Column(db.String, nullable=False)
+    definition = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship
+    deck = db.relationship("Deck", back_populates="terms")
+
+    def __repr__(self):
+        return f"<Term {self.term}>"

@@ -1,7 +1,7 @@
-import time
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
+import os
 
 db = SQLAlchemy()
 
@@ -12,13 +12,12 @@ def create_app(config_class=Config):
 
     db.init_app(app)
 
-    from src.endpoints import users_bp, products_bp
+    from src.endpoints.users import users_bp
+    from src.endpoints.decks import decks_bp
+    from src.endpoints.terms import terms_bp
 
-    app.register_blueprint(users_bp, url_prefix="/api")
-    app.register_blueprint(products_bp, url_prefix="/api")
-
-    @app.route("/api/time")
-    def get_current_time():
-        return {"time": time.time()}
+    app.register_blueprint(users_bp, url_prefix="/")
+    app.register_blueprint(decks_bp, url_prefix="/")
+    app.register_blueprint(terms_bp, url_prefix="/")
 
     return app

@@ -1,25 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import DeckList from './pages/DeckList';
+import DeckPage from './pages/DeckPage';
 
 function App() {
-  const [currentTime, setCurrentTime] = useState(0);
-
-  useEffect(() => {
-    fetch('/api/time')
-      .then(res => res.json())
-      .then(data => {
-        setCurrentTime(data.time);
-      })
-      .catch(err => console.error('Error fetching time:', err));
-  }, []);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        {/* ... no changes in this part ... */}
-        <p>The current time is {currentTime}.</p>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<DeckList />} />
+          <Route path="/deck/:deckId" element={<DeckPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
