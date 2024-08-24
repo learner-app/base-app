@@ -71,8 +71,8 @@ def generate_sentences(deck_id):
         # Second message: Select the best 5 sentences
         second_prompt = f"""Now, from the 10 sentences you just generated, select the 5 best sentences. Consider the following criteria:
         1. Variety of terms used
-        2. Clarity and naturalness of the sentences
-        3. Applicability of the sentence to common everyday usage.
+        2. Clarity and naturalness of the sentences in both ${deck.user_language} and ${deck.study_language}
+        3. Applicability of the sentence to common everyday usage
         4. Absolutely correct grammar use
         5. Avoid excessive use of vocabulary that is not in the list of terms
         6. Appropriate difficulty level, judged based on the list of terms
