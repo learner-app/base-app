@@ -15,6 +15,8 @@ def get_decks():
                 "deck_id": deck.deck_id,
                 "user_id": deck.user_id,
                 "deck_name": deck.deck_name,
+                "user_language": deck.user_language,
+                "study_language": deck.study_language,
                 "is_public": deck.is_public,
                 "created_at": deck.created_at,
                 "term_count": Term.query.filter_by(deck_id=deck.deck_id).count(),
@@ -36,6 +38,8 @@ def get_decks_by_user(user_id):
                 {
                     "deck_id": deck.deck_id,
                     "deck_name": deck.deck_name,
+                    "user_language": deck.user_language,
+                    "study_language": deck.study_language,
                     "is_public": deck.is_public,
                     "created_at": deck.created_at.isoformat(),
                     "term_count": Term.query.filter_by(deck_id=deck.deck_id).count(),
@@ -58,6 +62,8 @@ def get_decks_by_user_oldest_first(user_id):
                 {
                     "deck_id": deck.deck_id,
                     "deck_name": deck.deck_name,
+                    "user_language": deck.user_language,
+                    "study_language": deck.study_language,
                     "is_public": deck.is_public,
                     "created_at": deck.created_at.isoformat(),
                     "term_count": Term.query.filter_by(deck_id=deck.deck_id).count(),
@@ -76,6 +82,8 @@ def get_deck(deck_id):
             "deck_id": deck.deck_id,
             "user_id": deck.user_id,
             "deck_name": deck.deck_name,
+            "user_language": deck.user_language,
+            "study_language": deck.study_language,
             "is_public": deck.is_public,
             "created_at": deck.created_at,
             "term_count": Term.query.filter_by(deck_id=deck.deck_id).count(),
@@ -89,6 +97,8 @@ def create_deck():
     new_deck = Deck(
         user_id=data["user_id"],
         deck_name=data["deck_name"],
+        user_language=data["user_language"],
+        study_language=data["study_language"],
         is_public=data.get("is_public", False),
     )
     db.session.add(new_deck)
@@ -99,6 +109,8 @@ def create_deck():
                 "deck_id": new_deck.deck_id,
                 "user_id": new_deck.user_id,
                 "deck_name": new_deck.deck_name,
+                "user_language": new_deck.user_language,
+                "study_language": new_deck.study_language,
                 "is_public": new_deck.is_public,
                 "created_at": new_deck.created_at.isoformat(),
                 "term_count": 0,

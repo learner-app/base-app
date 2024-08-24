@@ -16,10 +16,12 @@ def create_app(config_class=Config):
     from src.endpoints.decks import decks_bp
     from src.endpoints.terms import terms_bp
     from src.endpoints.prompts import prompts_bp
+    from src.endpoints.sentences import sentences_bp
 
     app.register_blueprint(users_bp, url_prefix="/")
     app.register_blueprint(decks_bp, url_prefix="/")
     app.register_blueprint(terms_bp, url_prefix="/")
     app.register_blueprint(prompts_bp, url_prefix="/")
+    app.register_blueprint(sentences_bp, url_prefix="/")
 
     return app

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from src import db
 from src.models import Term, Deck, User
 from collections import defaultdict
+import csv, io
 
 terms_bp = Blueprint("terms", __name__)
 
@@ -49,6 +50,8 @@ def get_terms_by_deck(deck_id):
         "deck_id": deck_id,
         "deck_name": deck.deck_name,
         "user_id": deck.user_id,
+        "user_language": deck.user_language,
+        "study_language": deck.study_language,
         "username": deck.user.username,
         "terms": [
             {
@@ -132,3 +135,56 @@ def delete_term(term_id):
     db.session.commit()
 
     return jsonify({"message": f"Term {term_id} has been deleted"}), 200
+
+
+@terms_bp.route("/decks/<int:deck_id>/import_terms", methods=["POST"])
+def import_terms_from_csv(deck_id):
+    # Check if the deck exists
+    deck = Deck.query.get_or_404(deck_id)
+
+    # Check if the request has the file part
+    if "file" not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+
+    file = request.files["file"]
+
+    # If the user does not select a file, the browser submits an empty file without a filename
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    # Check if the file is a CSV
+    if not file.filename.lower().endswith(".csv"):
+        return jsonify({"error": "File must be a CSV"}), 400
+
+    try:
+        # Read the CSV file
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+        csv_reader = csv.reader(stream)
+
+        # Skip the header row if it exists
+        next(csv_reader, None)
+
+        terms_added = 0
+        for row in csv_reader:
+            if (
+                len(row) >= 2
+            ):  # Ensure the row has at least two columns (term and definition)
+                new_term = Term(deck_id=deck_id, term=row[0], definition=row[1])
+                db.session.add(new_term)
+                terms_added += 1
+
+        db.session.commit()
+
+        return (
+            jsonify(
+                {
+                    "message": f"Successfully imported {terms_added} terms to deck {deck_id}",
+                    "terms_added": terms_added,
+                }
+            ),
+            201,
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500

@@ -5,6 +5,8 @@ export default function NewDeckButton({ onSubmit }) {
   const [isOpen, setIsOpen] = useState(false);
   const [deckName, setDeckName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  const [userLanguage, setUserLanguage] = useState('English'); // default for now, TODO
+  const [studyLanguage, setStudyLanguage] = useState('');
 
   const currentUserId = 1; // default
 
@@ -19,7 +21,9 @@ export default function NewDeckButton({ onSubmit }) {
         body: JSON.stringify({
           user_id: currentUserId,
           deck_name: deckName,
-          is_public: isPublic
+          is_public: isPublic,
+          user_language: userLanguage,
+          study_language: studyLanguage
         }),
       });
 
@@ -43,6 +47,8 @@ export default function NewDeckButton({ onSubmit }) {
   const handleCancel = () => {
     setDeckName('');
     setIsPublic(false);
+    setUserLanguage('');
+    setStudyLanguage('');
     setIsOpen(false);
   };
 
@@ -73,6 +79,29 @@ export default function NewDeckButton({ onSubmit }) {
                   value={deckName}
                   onChange={(e) => setDeckName(e.target.value)}
                   placeholder="Enter deck name"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="user-language">Your Language</label>
+                <input
+                  id="user-language"
+                  type="text"
+                  value={userLanguage}
+                  onChange={(e) => setUserLanguage(e.target.value)}
+                  placeholder="Enter your language"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="study-language">Study Language</label>
+                <input
+                  id="study-language"
+                  type="text"
+                  value={studyLanguage}
+                  onChange={(e) => setStudyLanguage(e.target.value)}
+                  placeholder="Enter language to study"
+                  required
                 />
               </div>
               <div className="checkbox-group">

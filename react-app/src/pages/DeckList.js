@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import NewDeckButton from '../components/NewDeckButton';
+import DeckCard from '../components/DeckCard';
 import './DeckList.css';
 
 export default function DeckList() {
@@ -77,26 +77,11 @@ export default function DeckList() {
       <NewDeckButton onSubmit={handleNewDeck} />
       <ul className="deck-list">
         {decks.map(deck => (
-          <li key={deck.deck_id} className="deck-item">
-            <div className="deck-content">
-              <div className="deck-header">
-                <h3 className="deck-name">
-                  <Link to={`/deck/${deck.deck_id}`}>{deck.deck_name}</Link>
-                </h3>
-                <button 
-                  onClick={() => showDeleteConfirmation(deck)} 
-                  className="delete-button"
-                  aria-label="Delete deck"
-                >
-                  🗑️
-                </button>
-              </div>
-              <p className="deck-info">
-                {deck.term_count} terms | 
-                {deck.is_public ? ' Public' : ' Private'}
-              </p>
-            </div>
-          </li>
+          <DeckCard 
+            key={deck.deck_id} 
+            deck={deck} 
+            onDeleteClick={showDeleteConfirmation} 
+          />
         ))}
       </ul>
 

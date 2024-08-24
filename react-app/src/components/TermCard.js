@@ -41,23 +41,29 @@ export default function TermCard({ term, onEdit, onDelete }) {
             className="definition-input"
             placeholder="Definition"
           />
-          <button onClick={handleEdit} className="icon-button save-button" title="Save">
-            ✓
-          </button>
-          <button onClick={handleCancel} className="icon-button cancel-button" title="Cancel">
-            ✕
-          </button>
+          <div className="term-actions">
+            <button onClick={handleEdit} className="icon-button save-button" title="Save">
+              ✓
+            </button>
+            <button onClick={handleCancel} className="icon-button cancel-button" title="Cancel">
+              ✕
+            </button>
+          </div>
         </>
       ) : (
         <>
-          <span className="term">{term.term}</span>
-          <span className="definition">{term.definition}</span>
-          <button onClick={() => setIsEditing(true)} className="icon-button edit-button" title="Edit">
-            ✎
-          </button>
-          <button onClick={() => onDelete(term.term_id)} className="icon-button delete-button" title="Delete">
-            🗑️
-          </button>
+          <span className="term" title={term.term}>{term.term}</span>
+          <div className="definition-container">
+            <span className="definition" title={term.definition}>{term.definition}</span>
+            <div className="term-actions">
+              <button onClick={() => setIsEditing(true)} className="icon-button edit-button" title="Edit">
+                ✎
+              </button>
+              <button onClick={() => onDelete(term.term_id)} className="icon-button delete-button" title="Delete">
+                🗑️
+              </button>
+            </div>
+          </div>
         </>
       )}
     </div>

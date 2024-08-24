@@ -1,61 +1,98 @@
 .deck-page {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .back-button {
-    display: inline-block;
-    margin-bottom: 0px;
-    color: #4a5568;
-    text-decoration: none;
-    font-size: 16px;
-  }
-  
-  .back-button:hover {
-    text-decoration: underline;
-  }
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-  .generate-sentences-link {
-    color: #4a5568;
-    text-decoration: none;
-    font-size: 16px;
-    margin-left: 30px;
-    margin-bottom: 0;
-  }
+.back-button {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #4a5568;
+  text-decoration: none;
+  font-size: 16px;
+}
 
-  .generate-sentences-link:hover {
-    text-decoration: underline;
-  }
-  
-  .deck-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 0px;
-    margin-bottom: 10px;
-  }
-  
-  .deck-info {
-    font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 20px;
-  }
-  
-  .new-term-container {
-    margin-bottom: 30px;  /* Increased space under the 'Add Term' button */
-  }
-  
-  .term-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .loading, .error {
-    text-align: center;
-    font-size: 18px;
-    margin-top: 40px;
-  }
-  
-  .error {
-    color: #ef4444;
-  }
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.deck-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.deck-info {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #4a5568;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #2d3748;
+}
+
+.action-button svg {
+  margin-right: 8px;
+}
+
+.term-list-container {
+  margin-top: 20px;
+}
+
+.term-list-header {
+  display: flex;
+  background-color: #f3f4f6;
+  padding: 10px;
+  font-weight: bold;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.term-header, .definition-header {
+  padding: 5px;
+}
+
+.term-header {
+  flex: 0 0 25%; /* Takes up 25% of the container */
+}
+
+.definition-header {
+  flex: 0 0 75%; /* Takes up 75% of the container */
+}
+
+.term-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.loading, .error {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 40px;
+}
+
+.error {
+  color: #ef4444;
+}

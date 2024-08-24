@@ -1,0 +1,25 @@
+.rating-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 5px;
+  }
+  
+  .rating-bar-fill {
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+  }
+  
+  .rating-description {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    line-height: 20px;
+    color: black;
+    font-weight: bold;
+  }
