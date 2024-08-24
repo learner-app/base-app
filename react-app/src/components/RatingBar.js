@@ -11,18 +11,20 @@ const RatingBar = ({ rating }) => {
     if (rating >= 5) return 'Fair';
     if (rating >= 4) return 'Needs Work';
     if (rating >= 2) return 'Poor';
-    return 'Very Poor';
+    if (rating >= 0) return 'Very Poor';
+    return 'Null';
   };
 
   const getBarColor = (rating) => {
-    if (rating >= 10) return '#7FFFFF'; // Blue
-    if (rating >= 9) return '#7eff80'; // Green
-    if (rating >= 8) return '#beff7f';  // Light Green
-    if (rating >= 6) return '#feff7f';  // Yellow
-    if (rating >= 5) return '#ffdf80';  // Orange
-    if (rating >= 4) return '#ffbf7f';  // Deep Orange
-    if (rating >= 2) return '##ff7f7e';  // Red
-    return '#cfcfcf';  // Dark Red
+    if (rating >= 10) return '#7fffff'; // Blue
+    if (rating >= 9) return '#00ff00'; // Green
+    if (rating >= 8) return '#7eff80';  // Light Green
+    if (rating >= 6) return '#beff7f';  // Yellow-Green
+    if (rating >= 5) return '#feff7f';  // Yellow
+    if (rating >= 4) return '#ffdf80';  // Orange
+    if (rating >= 2) return '#ffbf7f';  // Deep Orange
+    if (rating >= 0) return '#ff7f7e';  // Red
+    return '#bbb';
   };
 
   const description = getDescription(rating);

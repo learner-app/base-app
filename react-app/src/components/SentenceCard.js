@@ -61,6 +61,12 @@ const SentenceCard = ({ sentence, onSentenceUpdate }) => {
                 <p className="review-text">{sentence.evaluation_text}</p>
             </div>
           )}
+          {sentence.terms_used && (
+            <div>
+                <p className="evaluation">Terms Used:</p>
+                <p className="review-text">{sentence.terms_used}</p>
+            </div>
+          )}
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="translation-form" autoComplete='off' autoCorrect='off' spellCheck='false'>

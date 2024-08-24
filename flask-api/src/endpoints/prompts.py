@@ -13,123 +13,121 @@ anthropic = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 @prompts_bp.route("/decks/<int:deck_id>/generate_sentences", methods=["POST"])
 def generate_sentences(deck_id):
     deck = Deck.query.get_or_404(deck_id)
-    terms = Term.query.filter_by(deck_id=deck_id).all()
+    all_terms = Term.query.filter_by(deck_id=deck_id).all()
 
-    if not terms:
+    if not all_terms:
         return jsonify({"error": "No terms found in this deck"}), 400
 
-    # Shuffle the terms for randomness
-    random.shuffle(terms)
+    num_terms_to_emphasize = max(len(all_terms) // 5, min(5, len(all_terms)))
+    emphasized_terms = random.sample(all_terms, num_terms_to_emphasize)
+    contextual_terms = [term for term in all_terms if term not in emphasized_terms]
 
-    terms_list = "\n".join(
-        f"Term: {term.term}\nDefinition: {term.definition}" for term in terms
+    # Create the terms list, with contextual terms first and emphasized terms last
+    terms_list = "Contextual Terms:\n"
+    terms_list += "\n".join(
+        f"Term: {term.term}\nDefinition: {term.definition}" for term in contextual_terms
+    )
+    terms_list += "\n\nKey Terms to Emphasize:\n"
+    terms_list += "\n".join(
+        f"Term: {term.term}\nDefinition: {term.definition}" for term in emphasized_terms
     )
 
-    # First pass: Generate 10 sentences
-    first_pass_prompt = f"""You are an expert language tutor creating practice sentences for a student learning {deck.study_language}. Their native language is {deck.user_language}.
-    Here is a list of terms and their definitions that the student is learning.
+    first_prompt = f"""You are an expert language tutor creating practice sentences for a student learning {deck.study_language}. Their native language is {deck.user_language}.
+    Here is a list of terms and their definitions that the student is learning:
 
     {terms_list}
 
     Your task is to create 10 example {deck.study_language} sentences and their {deck.user_language} translations that demonstrate the usage of these terms. Follow these guidelines:
 
-    1. Create coherent, meaningful sentences that accurately use the terms according to their definitions. Ensure you use the terms themselves, and not synonyms or alternate language.
-    2. Use simple language and refrain from using vocabulary or grammar that is not in the term list. However, you may use common words and grammar structures known to beginners, and you may use adjacent vocabulary if they help demonstrate the meaning of the terms.
-    3. Ensure both the {deck.study_language} sentences and their {deck.user_language} translations are completely grammatically sound.
-    4. Ensure that these sentences are natural and suitable for everyday conversations and practical scenarios.
-
+    1. Create coherent, meaningful sentences that accurately use the terms according to their definitions.
+    2. Emphasize the usage of the Key Terms listed at the end. You should try to use each of these terms at least once.
+    3. You can use the Contextual Terms to create more natural sentences and provide context, but prioritize the Key Terms.
+    4. Use simple language and refrain from using complex vocabulary or grammar that is not in the term list. However, you may use common words known to beginners.
+    5. Ensure both the {deck.study_language} sentences and their {deck.user_language} translations are grammatically correct.
+    6. Create sentences that are natural and suitable for everyday conversations and practical scenarios.
+    7. After each sentence, list the terms used in that sentence.
+   
     Present your examples in this format:
     Sentence: {{example sentence in {deck.study_language}}}
     Translation: {{corresponding translation in {deck.user_language}}}
+    Terms used: {{comma-separated list of terms used in this sentence}}
 
     Provide ONLY the examples in the specified format, with no additional commentary."""
 
-    # TODO: should we make the LLM also return the terms used in each sentence? for better quality of review later
-
     try:
-        first_pass_message = anthropic.messages.create(
+        first_response = anthropic.messages.create(
             model="claude-3-5-sonnet-20240620",
             max_tokens=1000,
             messages=[
                 {
                     "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": first_pass_prompt,
-                        }
-                    ],
+                    "content": first_prompt,
                 }
             ],
         )
 
-        # Extract and process the generated sentences
-        first_pass_text = first_pass_message.content[0].text
+        generated_text = first_response.content[0].text
 
-        sentences = []
-        for entry in first_pass_text.split("\n\n"):
-            if "Sentence:" in entry and "Translation:" in entry:
-                machine_translation = (
-                    entry.split("Sentence:")[1].split("Translation:")[0].strip()
-                )
-                user_lang_sentence = entry.split("Translation:")[1].strip()
-                sentences.append(
-                    {"sentence": user_lang_sentence, "translation": machine_translation}
-                )
-
-        # Second pass: Filter down to the best 5 sentences
-        second_pass_prompt = f"""You are an expert language tutor selecting the best practice sentences for a student learning {deck.study_language}. Their native language is {deck.user_language}.
-        
-        Here are 10 sentences with their translations:
-
-        {first_pass_text}
-
-        Your task is to select the 5 best sentences from this list. Consider the following criteria:
+        # Second message: Select the best 5 sentences
+        second_prompt = f"""Now, from the 10 sentences you just generated, select the 5 best sentences. Consider the following criteria:
         1. Variety of terms used
         2. Clarity and naturalness of the sentences
-        3. Usefulness in everyday conversations
-        4. Appropriate difficulty level for a beginner
+        3. Applicability of the sentence to common everyday usage.
+        4. Absolutely correct grammar use
+        5. Avoid excessive use of vocabulary that is not in the list of terms
+        6. Appropriate difficulty level, judged based on the list of terms
 
-        Present your selected sentences in the same format as they were given, with no additional commentary."""
+        Present your selected sentences in the same format as before, with no additional commentary."""
 
-        second_pass_message = anthropic.messages.create(
+        # Second API call to select the best 5 sentences
+        second_response = anthropic.messages.create(
             model="claude-3-5-sonnet-20240620",
-            max_tokens=1000,
+            max_tokens=500,
             messages=[
                 {
                     "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": second_pass_prompt,
-                        }
-                    ],
-                }
+                    "content": first_prompt,
+                },
+                {
+                    "role": "assistant",
+                    "content": generated_text,
+                },
+                {
+                    "role": "user",
+                    "content": second_prompt,
+                },
             ],
         )
 
-        # Extract and process the filtered sentences
-        second_pass_text = second_pass_message.content[0].text
+        # Process the selected sentences
+        generated_text = second_response.content[0].text
 
-        filtered_sentences = []
-        for entry in second_pass_text.split("\n\n"):
-            if "Sentence:" in entry and "Translation:" in entry:
-                machine_translation = (
-                    entry.split("Sentence:")[1].split("Translation:")[0].strip()
+        selected_sentences = []
+        for entry in generated_text.strip().split("\n\n"):
+            if (
+                "Sentence:" in entry
+                and "Translation:" in entry
+                and "Terms used:" in entry
+            ):
+                sentence_parts = entry.split("\n")
+                # Sentence is the machine translation, machine translation is the sentence
+                translation = sentence_parts[0].split("Sentence:")[1].strip()
+                sentence = sentence_parts[1].split("Translation:")[1].strip()
+                terms_used = sentence_parts[2].split("Terms used:")[1].strip()
+                selected_sentences.append(
+                    {
+                        "sentence": sentence,
+                        "translation": translation,
+                        "terms_used": terms_used,
+                    }
                 )
-                user_lang_sentence = entry.split("Translation:")[1].strip()
-                filtered_sentences.append(
-                    {"sentence": user_lang_sentence, "translation": machine_translation}
-                )
 
-        # Shuffle the final sentences for additional randomness
-        random.shuffle(filtered_sentences)
-
-        for sentence in filtered_sentences:
+        for sentence in selected_sentences:
             new_sentence = GeneratedSentence(
                 deck_id=deck_id,
                 sentence=sentence["sentence"],
                 machine_translation=sentence["translation"],
+                terms_used=sentence["terms_used"],
             )
             db.session.add(new_sentence)
         db.session.commit()
@@ -138,7 +136,7 @@ def generate_sentences(deck_id):
             {
                 "deck_id": deck_id,
                 "deck_name": deck.deck_name,
-                "generated_sentences": filtered_sentences,
+                "generated_sentences": selected_sentences,
             }
         )
 
@@ -168,13 +166,14 @@ def translate_sentence(sentence_id):
     prompt += "This was the original translation of the sentence that you generated:"
     prompt += machine_translation + "\n"
     prompt += "Please provide feedback to me based on the original machine translation, as well as your own insight.\n"
-    prompt += "Note that the user's translation does not have to directly match the original machine's translation.\n"
-    prompt += "If you feel the user's translation is different yet still adequate, reflect that in your rating and review.\n"
+    prompt += f"Note that my translation does not have to directly match the original machine's translation, but still should mean the same thing when translated to ${deck.user_language}.\n"
+    prompt += "If you feel my translation is different, yet still accurate and adequate, reflect that in your rating and review.\n"
     prompt += "However, please still critique heavily on any grammatical, spelling, or logical errors.\n"
     prompt += "Please format your feedback in the following way:\n"
     prompt += "Rating: {number from 1 to 10, out of 10}\n"
     prompt += "Review: {brief and concise review of my translation and what to focus on & change.}\n"
-    prompt += "ONLY PROVIDE the ratings and reviews strictly in the above format and NOTHING ELSE."
+    prompt += "If my translation means the exact same thing as the original sentence and is grammatically correct, don't be afraid to a give perfect 10!"
+    prompt += "Lastly, ONLY PROVIDE the ratings and reviews strictly in the above format and NOTHING ELSE."
 
     try:
         message = anthropic.messages.create(

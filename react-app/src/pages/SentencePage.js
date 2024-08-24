@@ -42,7 +42,7 @@ export default function SentencePage() {
   const handleSentenceUpdate = (updatedSentence) => {
     setSentences(prevSentences => 
       prevSentences.map(sentence => 
-        sentence.id === updatedSentence.id ? updatedSentence : sentence
+        sentence.id === updatedSentence.id ? { ...sentence, ...updatedSentence } : sentence
       )
     );
   };
