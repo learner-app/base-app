@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import SentenceCard from '../components/SentenceCard';
 import GenerateSentencesButton from '../components/GenerateSentencesButton';
 import './SentencePage.css';
@@ -11,6 +11,7 @@ export default function SentencePage() {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
   const { deckId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSentences();
@@ -89,6 +90,12 @@ export default function SentencePage() {
     }
   };
 
+  const allSentencesAnswered = sentences.every(sentence => sentence.user_translation);
+
+  const goToReviewPage = () => {
+    navigate(`/deck/${deckId}/review`);
+  };
+
   if (loading) return <div className="loading">Loading sentences...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
@@ -99,10 +106,17 @@ export default function SentencePage() {
       <Link to={`/deck/${deckId}`} className="back-button">← Back to Deck</Link>
       <h1 className="page-title">Sentence Practice</h1>
       
-      <GenerateSentencesButton 
-        onClick={handleGenerateSentences} 
-        isLoading={generating}
-      />
+      <div className="sentence-button-container">
+        <GenerateSentencesButton 
+          onClick={handleGenerateSentences} 
+          isLoading={generating}
+        />
+        {allSentencesAnswered && (
+          <button onClick={goToReviewPage} className="review-page-button">
+            Review Sentences
+          </button>
+        )}
+      </div>
       
       {sentences.length === 0 ? (
         <div className="no-sentences-message">No sentences available. Click "Generate New Sentences" to create some!</div>

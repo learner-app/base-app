@@ -18,39 +18,46 @@ def generate_sentences(deck_id):
     if not all_terms:
         return jsonify({"error": "No terms found in this deck"}), 400
 
-    num_terms_to_emphasize = max(len(all_terms) // 5, min(5, len(all_terms)))
-    emphasized_terms = random.sample(all_terms, num_terms_to_emphasize)
-    contextual_terms = [term for term in all_terms if term not in emphasized_terms]
+    num_terms_to_emphasize = min(len(all_terms), 8)
+    random.shuffle(all_terms)
+    emphasized_terms = all_terms[:num_terms_to_emphasize]
+    contextual_terms = all_terms[num_terms_to_emphasize:]
 
     # Create the terms list, with contextual terms first and emphasized terms last
     terms_list = "Contextual Terms:\n"
     terms_list += "\n".join(
         f"Term: {term.term}\nDefinition: {term.definition}" for term in contextual_terms
     )
-    terms_list += "\n\nKey Terms to Emphasize:\n"
-    terms_list += "\n".join(
+
+    emphasized_terms_list = "\nKey Terms to Emphasize:\n"
+    emphasized_terms_list += "\n".join(
         f"Term: {term.term}\nDefinition: {term.definition}" for term in emphasized_terms
     )
+
+    print(emphasized_terms_list)
+
+    # TODO: Remove the line about complicated sentence structures depending on beginner, advanced, intermediate, etc. on rule 3.
 
     first_prompt = f"""You are an expert language tutor creating practice sentences for a student learning {deck.study_language}. Their native language is {deck.user_language}.
     Here is a list of terms and their definitions that the student is learning:
 
     {terms_list}
+    {emphasized_terms_list}
 
-    Your task is to create 10 example {deck.study_language} sentences and their {deck.user_language} translations that demonstrate the usage of these terms. Follow these guidelines:
+    Your task is to create {num_terms_to_emphasize} example {deck.study_language} sentences and their {deck.user_language} translations, each focusing on one of the Key Terms. Follow these guidelines:
 
-    1. Create coherent, meaningful sentences that accurately use the terms according to their definitions.
-    2. Emphasize the usage of the Key Terms listed at the end. You should try to use each of these terms at least once.
-    3. You can use the Contextual Terms to create more natural sentences and provide context, but prioritize the Key Terms.
-    4. Use simple language and refrain from using complex vocabulary or grammar that is not in the term list. However, you may use common words known to beginners.
-    5. Ensure both the {deck.study_language} sentences and their {deck.user_language} translations are grammatically correct.
-    6. Create sentences that are natural and suitable for everyday conversations and practical scenarios.
-    7. After each sentence, list the terms used in that sentence.
+    1. Create one sentence for each of the Key Terms listed at the end. Each sentence should primarily demonstrate the usage of its assigned Key Term.
+    2. You can and are encouraged to use the Contextual Terms and other Key Terms to create more natural sentences and provide context, but the main focus should be on the assigned Key Term for each sentence.
+    3. Refrain from using complex vocabulary or grammar that is not in the term list. However, you may use common adjacent words known to beginners. You may also occasionally use more complicated sentence structures.
+    4. Ensure both the {deck.study_language} sentences and their {deck.user_language} translations are grammatically correct.
+    5. Create sentences that are natural and suitable for everyday conversations and practical scenarios.
+    6. After each sentence, list only the Contextual and Key Terms used in that sentence, with the Key Term listed first. Ensure that the terms you include are actually in the list of terms above.
+    7. Most importantly, ensure that the sentence generated makes complete logical sense.
    
     Present your examples in this format:
     Sentence: {{example sentence in {deck.study_language}}}
     Translation: {{corresponding translation in {deck.user_language}}}
-    Terms used: {{comma-separated list of terms used in this sentence}}
+    Terms used: {{comma-separated list of terms used in this sentence, starting with the Key Term}}
 
     Provide ONLY the examples in the specified format, with no additional commentary."""
 
@@ -68,40 +75,48 @@ def generate_sentences(deck_id):
 
         generated_text = first_response.content[0].text
 
-        # Second message: Select the best 5 sentences
-        second_prompt = f"""Now, from the 10 sentences you just generated, select the 5 best sentences. Consider the following criteria:
-        1. Variety of terms used
-        2. Clarity and naturalness of the sentences in both ${deck.user_language} and ${deck.study_language}
-        3. Applicability of the sentence to common everyday usage
-        4. Absolutely correct grammar use
-        5. Avoid excessive use of vocabulary that is not in the list of terms
-        6. Appropriate difficulty level, judged based on the list of terms
+        print("first generation")
+        print(generated_text)
 
-        Present your selected sentences in the same format as before, with no additional commentary."""
+        # # Second message: Select the best sentences
+        # second_prompt = f"""Now, review the sentences you just generated. Select the sentences that meet the following criteria:
+        # 1. The sentence clearly demonstrates the usage of its assigned Key Term.
+        # 2. The sentence avoids excessive use of difficult vocabulary that is not in the list of terms.
+        # 3. The sentence has absolutely correct grammar usage.
+        # 4. Most importantly, ensure that the sentence makes logical sense.
+        # 5. Lastly, the "Terms Used" must only contains terms from the provided list of terms. If the sentence follows all of the above rules but only fails this one, you may choose to remove the term from the "Terms Used" list and include the sentence in the final list.
 
-        # Second API call to select the best 5 sentences
-        second_response = anthropic.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=500,
-            messages=[
-                {
-                    "role": "user",
-                    "content": first_prompt,
-                },
-                {
-                    "role": "assistant",
-                    "content": generated_text,
-                },
-                {
-                    "role": "user",
-                    "content": second_prompt,
-                },
-            ],
-        )
+        # You must choose at least 5 sentences to keep, but can choose to keep all of them if they all properly follow the criteria above.
+        # Don't be scared to keep all 10 if they are all appropriate!
 
-        # Process the selected sentences
-        generated_text = second_response.content[0].text
+        # Present your selected sentences in the same format as before, with no additional commentary."""
 
+        # # Second API call to select the best sentences
+        # second_response = anthropic.messages.create(
+        #     model="claude-3-5-sonnet-20240620",
+        #     max_tokens=500,
+        #     messages=[
+        #         {
+        #             "role": "user",
+        #             "content": first_prompt,
+        #         },
+        #         {
+        #             "role": "assistant",
+        #             "content": generated_text,
+        #         },
+        #         {
+        #             "role": "user",
+        #             "content": second_prompt,
+        #         },
+        #     ],
+        # )
+
+        # # Process the selected sentences
+        # generated_text = second_response.content[0].text
+        # print("second generation")
+        # print(generated_text)
+
+        # TODO: may have to do a manual check of terms used here.
         selected_sentences = []
         for entry in generated_text.strip().split("\n\n"):
             if (
@@ -110,7 +125,6 @@ def generate_sentences(deck_id):
                 and "Terms used:" in entry
             ):
                 sentence_parts = entry.split("\n")
-                # Sentence is the machine translation, machine translation is the sentence
                 translation = sentence_parts[0].split("Sentence:")[1].strip()
                 sentence = sentence_parts[1].split("Translation:")[1].strip()
                 terms_used = sentence_parts[2].split("Terms used:")[1].strip()
@@ -168,11 +182,13 @@ def translate_sentence(sentence_id):
     prompt += "Please provide feedback to me based on the original machine translation, as well as your own insight.\n"
     prompt += f"Note that my translation does not have to directly match the original machine's translation, but still should mean the same thing when translated to ${deck.user_language}.\n"
     prompt += "If you feel my translation is different, yet still accurate and adequate, reflect that in your rating and review.\n"
-    prompt += "However, please still critique heavily on any grammatical, spelling, or logical errors.\n"
+    prompt += (
+        "However, please still critique any grammatical, spelling, or logical errors.\n"
+    )
     prompt += "Please format your feedback in the following way:\n"
     prompt += "Rating: {number from 1 to 10, out of 10}\n"
     prompt += "Review: {brief and concise review of my translation and what to focus on & change.}\n"
-    prompt += "If my translation means the exact same thing as the original sentence and is grammatically correct, don't be afraid to a give perfect 10!"
+    prompt += "If my translation means the same thing as the original sentence and is grammatically correct, don't be afraid to a give perfect 10!"
     prompt += "Lastly, ONLY PROVIDE the ratings and reviews strictly in the above format and NOTHING ELSE."
 
     try:
