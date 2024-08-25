@@ -33,7 +33,7 @@
   justify-content: center;
   align-items: center;
   margin-top: 20px;
-  gap: 10px; /* Add space between items */
+  gap: 10px;
 }
 
 .nav-button {
@@ -54,7 +54,7 @@
 .sentence-count {
   font-size: 16px;
   font-weight: bold;
-  margin: 0 15px; /* Add horizontal space around the count */
+  margin: 0 15px;
 }
 
 .loading, .error {
@@ -93,9 +93,6 @@
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s, opacity 0.2s;
-}
-
-.review-page-button {
   background-color: #3b82f6;
 }
 
@@ -106,4 +103,135 @@
 .review-page-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #3b82f6;
+}
+
+.modal-options {
+  margin-bottom: 30px;
+}
+
+.language-direction {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.language-direction label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.language-direction input[type="radio"] {
+  margin-right: 10px;
+}
+
+.sentence-count {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sentence-count label {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sentence-count input[type="text"] {
+  width: 40px;
+  padding: 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.generate-button {
+  background-color: #10b981;
+  color: white;
+}
+
+.generate-button:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.generate-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.modal-buttons button:last-child {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.modal-buttons button:last-child:hover {
+  background-color: #d1d5db;
+}
+
+/* Tooltip styles */
+.generate-button[title]:not([title=""]):hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.generate-button[title]:not([title=""]) {
+  position: relative;
 }

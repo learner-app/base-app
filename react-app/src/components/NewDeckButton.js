@@ -23,7 +23,7 @@ export default function NewDeckButton({ onSubmit }) {
           deck_name: deckName,
           is_public: isPublic,
           user_language: userLanguage,
-          study_language: studyLanguage
+          deck_language: studyLanguage
         }),
       });
 

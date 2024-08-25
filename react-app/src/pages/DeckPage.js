@@ -95,7 +95,7 @@ export default function DeckPage() {
       <Link to="/" className="back-button">← Back to Decks</Link>
       <h1 className="deck-title">{deck.deck_name}</h1>
       <p className="deck-info">
-        {deck.study_language + ' -> ' + deck.user_language + ' '} | 
+        {deck.deck_language + ' -> ' + deck.user_language + ' '} | 
         {' ' + deck.terms.length} terms | {deck.is_public ? 'Public' : 'Private'}
       </p>
       <div className="action-buttons">

@@ -51,7 +51,7 @@ def get_terms_by_deck(deck_id):
         "deck_name": deck.deck_name,
         "user_id": deck.user_id,
         "user_language": deck.user_language,
-        "study_language": deck.study_language,
+        "deck_language": deck.deck_language,
         "username": deck.user.username,
         "terms": [
             {

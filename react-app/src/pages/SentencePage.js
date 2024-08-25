@@ -10,12 +10,31 @@ export default function SentencePage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [userLangGiven, setUserLangGiven] = useState(false);
+  const [sentenceCount, setSentenceCount] = useState('8');
+  const [sentenceCountError, setSentenceCountError] = useState('');
+  const [deckDetails, setDeckDetails] = useState(null);
   const { deckId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    fetchDeckDetails();
     fetchSentences();
   }, [deckId]);
+
+  const fetchDeckDetails = async () => {
+    try {
+      const response = await fetch(`/decks/${deckId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch deck details');
+      }
+      const data = await response.json();
+      setDeckDetails(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const fetchSentences = async () => {
     setLoading(true);
@@ -60,7 +79,24 @@ export default function SentencePage() {
     );
   };
 
+  const handleSentenceCountChange = (e) => {
+    const value = e.target.value;
+    setSentenceCount(value);
+    
+    const numValue = parseInt(value, 10);
+    if (isNaN(numValue) || numValue < 1) {
+      setSentenceCountError('Minimum 0 sentences.');
+    } else if (numValue > 12) {
+      setSentenceCountError('Maximum 12 sentences.');
+    } else {
+      setSentenceCountError('');
+    }
+  };
+
   const handleGenerateSentences = async () => {
+    if (sentenceCountError) {
+      return;
+    }
     setGenerating(true);
     setError(null);
     try {
@@ -73,7 +109,7 @@ export default function SentencePage() {
       }
 
       // Then, generate new sentences
-      const generateResponse = await fetch(`/decks/${deckId}/generate_sentences`, {
+      const generateResponse = await fetch(`/decks/${deckId}/generate_sentences?user_lang_given=${userLangGiven}&count=${sentenceCount}`, {
         method: 'POST',
       });
       if (!generateResponse.ok) {
@@ -86,6 +122,7 @@ export default function SentencePage() {
       setError(err.message);
     } finally {
       setGenerating(false);
+      setShowModal(false);
       fetchSentences();
     }
   };
@@ -94,6 +131,14 @@ export default function SentencePage() {
 
   const goToReviewPage = () => {
     navigate(`/deck/${deckId}/review`);
+  };
+
+  const openGenerateModal = () => {
+    setShowModal(true);
+  };
+
+  const closeGenerateModal = () => {
+    setShowModal(false);
   };
 
   if (loading) return <div className="loading">Loading sentences...</div>;
@@ -108,10 +153,10 @@ export default function SentencePage() {
       
       <div className="sentence-button-container">
         <GenerateSentencesButton 
-          onClick={handleGenerateSentences} 
+          onClick={openGenerateModal} 
           isLoading={generating}
         />
-        {allSentencesAnswered && (
+        {sentences.length > 0 && allSentencesAnswered && (
           <button onClick={goToReviewPage} className="review-page-button">
             Review Sentences
           </button>
@@ -137,6 +182,57 @@ export default function SentencePage() {
         </div>
       ) : (
         <div className="error">No sentence found at current index. Try generating new sentences.</div>
+      )}
+
+      {showModal && deckDetails && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Generate New Sentences</h2>
+            <div className="modal-options">
+              <div className="language-direction">
+                <label>
+                  <input
+                    type="radio"
+                    name="languageDirection"
+                    checked={!userLangGiven}
+                    onChange={() => setUserLangGiven(false)}
+                  />
+                  {deckDetails.deck_language} → {deckDetails.user_language}
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="languageDirection"
+                    checked={userLangGiven}
+                    onChange={() => setUserLangGiven(true)}
+                  />
+                  {deckDetails.user_language} → {deckDetails.deck_language}
+                </label>
+              </div>
+              <div className="sentence-count">
+                <label>
+                  Number of sentences (1-12):
+                  <input
+                    type="text"
+                    value={sentenceCount}
+                    onChange={handleSentenceCountChange}
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="modal-buttons">
+              <button 
+                onClick={handleGenerateSentences} 
+                disabled={generating || !!sentenceCountError}
+                title={sentenceCountError || ''}
+                className="generate-button"
+              >
+                {generating ? 'Generating...' : 'Generate'}
+              </button>
+              <button onClick={closeGenerateModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -19,7 +19,7 @@ const DeckCard = ({ deck, onDeleteClick }) => {
           </button>
         </div>
         <p className="deck-info">
-          {deck.study_language + ' -> ' + deck.user_language + ' '} | 
+          {deck.deck_language + ' -> ' + deck.user_language + ' '} | 
           {' ' + deck.term_count} terms | 
           {deck.is_public ? ' Public' : ' Private'}
         </p>

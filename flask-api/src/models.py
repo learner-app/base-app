@@ -24,7 +24,7 @@ class Deck(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
     deck_name = db.Column(db.String, nullable=False)
     user_language = db.Column(db.String)
-    study_language = db.Column(db.String)
+    deck_language = db.Column(db.String)
     is_public = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -63,6 +63,8 @@ class GeneratedSentence(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     deck_id = db.Column(db.Integer, db.ForeignKey("decks.deck_id"), nullable=False)
+    # If the sentence you need to translate is in user_lang
+    user_lang_given = db.Column(db.Boolean, nullable=False)
     sentence = db.Column(db.Text, nullable=False)
     machine_translation = db.Column(db.Text, nullable=False)
     terms_used = db.Column(db.Text, nullable=False)
@@ -83,6 +85,7 @@ class ArchivedSentence(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     deck_id = db.Column(db.Integer, db.ForeignKey("decks.deck_id"), nullable=False)
+    user_lang_given = db.Column(db.Boolean, nullable=False)
     sentence = db.Column(db.Text, nullable=False)
     machine_translation = db.Column(db.Text, nullable=False)
     terms_used = db.Column(db.Text, nullable=False)

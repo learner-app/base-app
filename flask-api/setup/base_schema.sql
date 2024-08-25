@@ -12,7 +12,7 @@ CREATE TABLE decks (
     user_id INTEGER NOT NULL,
     deck_name TEXT NOT NULL,
     user_language TEXT NOT NULL,
-    study_language TEXT NOT NULL,
+    deck_language TEXT NOT NULL,
     is_public BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -32,6 +32,7 @@ CREATE TABLE terms (
 CREATE TABLE generated_sentences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     deck_id INTEGER NOT NULL,
+    user_lang_given BOOLEAN NOT NULL,
     sentence TEXT NOT NULL,
     machine_translation TEXT NOT NULL,
     terms_used TEXT NOT NULL,
@@ -46,6 +47,7 @@ CREATE TABLE generated_sentences (
 CREATE TABLE archived_sentences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     deck_id INTEGER NOT NULL,
+    user_lang_given BOOLEAN NOT NULL,
     sentence TEXT NOT NULL,
     machine_translation TEXT NOT NULL,
     terms_used TEXT NOT NULL,

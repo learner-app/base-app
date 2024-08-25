@@ -15,6 +15,8 @@ def get_sentences(deck_id):
             "sentences": [
                 {
                     "id": sentence.id,
+                    "deck_id": sentence.deck_id,
+                    "user_lang_given": sentence.user_lang_given,
                     "sentence": sentence.sentence,
                     "machine_translation": sentence.machine_translation,
                     "user_translation": sentence.user_translation,
@@ -37,6 +39,7 @@ def archive_sentences(deck_id):
     for sentence in sentences:
         archived_sentence = ArchivedSentence(
             deck_id=sentence.deck_id,
+            user_lang_given=sentence.user_lang_given,
             sentence=sentence.sentence,
             machine_translation=sentence.machine_translation,
             terms_used=sentence.terms_used,

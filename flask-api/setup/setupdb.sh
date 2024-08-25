@@ -24,7 +24,7 @@ USER_ID=$(sqlite3 test_database.db "SELECT user_id FROM users WHERE username='de
 # Insert a deck for the default user
 echo "Inserting default deck for the user"
 sqlite3 test_database.db <<EOF
-INSERT INTO decks (user_id, deck_name, user_language, study_language, is_public) VALUES ($USER_ID, 'korean 1', 'English', 'Korean', 0);
+INSERT INTO decks (user_id, deck_name, user_language, deck_language, is_public) VALUES ($USER_ID, 'korean 1', 'English', 'Korean', 0);
 EOF
 
 # Get the deck_id of the inserted deck
