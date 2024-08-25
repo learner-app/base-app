@@ -174,7 +174,7 @@ def translate_sentence(sentence_id):
         My translation (in {translated_lang}):
         {user_translation}
 
-        Machine translation (for reference):
+        Machine translation (ONLY for reference):
         {machine_translation}
 
         Terms used in this exercise:
@@ -183,25 +183,21 @@ def translate_sentence(sentence_id):
         Please provide feedback based on the information provided above. Your feedback should consist of a rating and a review.
 
         Rating criteria:
-        - Mainly based on accuracy of vocabulary and grammar
         - Scale: integer from 1 to 10, where:
         0-1: Very Poor (no attempt given)
         2-3: Poor (major errors in both vocabulary AND grammar)
         4-5: Fair (some significant errors, but a good attempt and partially correct)
-        6-7: Good (some errors, but the meaning gets across)
-        8: Very Good (minor errors and mostly accurate)
-        9: Excellent (extremely minor errors)
-        10: Perfect (fully accurate in meaning and grammar, with negligible errors)
+        6-7: Decent (some errors, but the meaning gets across)
+        8: Good (minor errors and mostly accurate)
+        9: Very Good (very few minor errors)
+        10: Excellent (accurate in meaning and grammar, with negligible errors or interchangable variations)
 
         Review guidelines:
-        - Evaluate my translation primarily based on how well it conveys the meaning of the original sentence
-        - My translation can use different words or grammatical structures as long as the meaning is preserved
-        - When referencing the machine translation, only mention specific words or phrases that are actually present in it
+        - Evaluate my translation primarily based on how well it conveys the meaning of the original sentence and how gramatically correct it is
         - Do not claim that the machine translation used certain words or structures unless you can directly quote them
-        - Highlight areas for improvement in my translation
         - Provide specific feedback on any grammatical, spelling, vocabulary, or logical errors you can identify
         - If my translation is different from the machine translation but still accurate and appropriate, reflect this positively
-        - IMPORTANT: Use the exact terms provided in the "Terms used" section. Do not suggest alternative translations for these terms.
+        - IMPORTANT: Use the exact terms and definitions provided in the "Terms used" section. Do not suggest alternative translations for these terms.
 
         Please format your feedback exactly as follows:
 
@@ -209,12 +205,14 @@ def translate_sentence(sentence_id):
         Review: {{brief and concise review of the translation, focusing on accuracy, grammar, and any necessary improvements}}
 
         The review should be 2 or 3 sentences maximum, only going over this limit if ABSOLUTELY necessary.
-        Note: If my translation is perfectly accurate and grammatically correct, don't hesitate to give a 10!
+        Note: My translation could be better than or have slight variations from the machine translation. 
+        If my translation is accurate in meaning and grammatically correct, please give me a 10.
+        Additionally, if there are minor variations of language that don't affect the overall accuracy, please still give me a 10.
 
         IMPORTANT:
-        1. Keep the reviews short and concise, avoiding unnecessary elaboration.
-        2. Focus on evaluating my translation's accuracy of expressing the original meaning, not on matching the machine translation exactly.
-        3. When discussing the machine translation, PLEASE ONLY reference words or phrases that are explicitly present in it.
+        1. Keep the reviews short and concise.
+        2. Focus on evaluating my translation's accuracy of translating the original sentence in {original_lang}, not on matching the machine translation exactly.
+        3. When discussing the machine translation, PLEASE check yourself and ONLY reference words or phrases that are explicitly present in it.
         4. Provide ONLY the Rating and Review in the specified format. Do not include any other text or explanations.
         """
 
