@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from src import db
 from src.models import Deck, GeneratedSentence, Term
 from anthropic import Anthropic
-import os, re, random
+import os, re, random, json
 
 prompts_bp = Blueprint("prompts", __name__)
 
@@ -17,7 +17,6 @@ def generate_sentences(deck_id):
 
     user_lang_given = request.args.get("user_lang_given", "false").lower() == "true"
     sentence_count = int(request.args.get("count"))
-    print("Sentence Count", sentence_count)
 
     if not all_terms:
         return jsonify({"error": "No terms found in this deck"}), 400
@@ -27,20 +26,14 @@ def generate_sentences(deck_id):
     emphasized_terms = all_terms[:num_terms_to_emphasize]
     contextual_terms = all_terms[num_terms_to_emphasize:]
 
-    # Create the terms list, with contextual terms first and emphasized terms last
-    terms_list = "Contextual Terms:\n"
-    terms_list += "\n".join(
+    terms_list = "Contextual Terms:\n" + "\n".join(
         f"Term: {term.term} : {term.definition}" for term in contextual_terms
     )
-
-    emphasized_terms_list = "\nKey Terms to Emphasize:\n"
-    emphasized_terms_list += "\n".join(
+    emphasized_terms_list = "\nKey Terms to Emphasize:\n" + "\n".join(
         f"Term: {term.term} : {term.definition}" for term in emphasized_terms
     )
-
+    print("\Key Terms")
     print(emphasized_terms_list)
-
-    # TODO: Remove the line about complicated sentence structures depending on beginner, advanced, intermediate, etc. on rule 3.
 
     first_prompt = f"""You are an expert language tutor creating practice sentences for a student learning {deck.deck_language}. Their native language is {deck.user_language}.
     Here is a list of terms and their definitions that the student is learning:
@@ -50,7 +43,7 @@ def generate_sentences(deck_id):
 
     Your task is to create {sentence_count} example {deck.deck_language} sentences and their {deck.user_language} translations, each focusing on one of the Key Terms. Follow these guidelines:
 
-    1. Create one sentence for each of the Key Terms listed at the end. Each sentence should primarily demonstrate the usage of its assigned Key Term.
+    1. Create one sentence for each of the Key Terms in order. Each sentence should primarily demonstrate the usage of its assigned Key Term.
     2. You can and are encouraged to use the Contextual Terms and other Key Terms to create more natural sentences and provide context, but the main focus should be on the assigned Key Term for each sentence.
     3. IMPORTANT: Use the exact terms and definitions provided in the term list. Do not use synonyms or alternative phrasings for these terms.
     4. Refrain from using complex vocabulary or grammar that is not in the term list. However, you may use common words known to beginners. You may also occasionally use more complicated sentence structures.
@@ -63,92 +56,61 @@ def generate_sentences(deck_id):
     Present your examples in this format:
     Sentence: {{example sentence in {deck.deck_language}}}
     Translation: {{corresponding translation in {deck.user_language}}}
-    Terms used: {{semicolon-separated list of terms used in this sentence, starting with the Key Term, using the exact form provided in the term list, including both {deck.deck_language} and {deck.user_language} versions}}
-    New terms: {{semicolon-separated list of new vocabulary terms in the same format term : def used in this sentence that are not in the lists above.}}
+    Terms used: {{term1}} ::: {{definition1}} ||| {{term2}} ::: {{definition2}} ||| ...
+    New terms: {{new_term1}} ::: {{new_definition1}} ||| {{new_term2}} ::: {{new_definition2}} ||| ...
 
+    New terms should consist of any non-beginner vocabulary AND all non-beginner grammatical phrases, conjugations, or particles that are used in the example sentence, but not included within the list of provided terms.
     If there are no new terms, keep "New terms:" and nothing afterwards.
 
     Remember:
-    1. Always use the exact terms from the provided list. Do not substitute them with synonyms or rephrase them.
-    2. Ensure the sentences are logical and sensical.
-    3. Provide ONLY the examples in the specified format, with no additional commentary."""
+    1. Each sentence should focus primarily on its assigned Key Term.
+    2. Always use the exact terms from the provided list, and be sure to include them in the "Terms used" output. Do not substitute them with synonyms or rephrase them.
+    3. Ensure the sentences are logical, sensical, and GRAMATICALLY CORRECT.
+    4. Provide ONLY the examples in the specified format, with no additional commentary."""
 
     try:
         first_response = anthropic.messages.create(
             model="claude-3-5-sonnet-20240620",
             max_tokens=1000,
-            messages=[
-                {
-                    "role": "user",
-                    "content": first_prompt,
-                }
-            ],
+            messages=[{"role": "user", "content": first_prompt}],
         )
 
         generated_text = first_response.content[0].text
-
-        print("first generation")
+        print("\n\nGenerated Text:")
         print(generated_text)
 
-        # # Second message: Select the best sentences
-        # second_prompt = f"""Now, review the sentences you just generated. Select the sentences that meet the following criteria:
-        # 1. The sentence clearly demonstrates the usage of its assigned Key Term.
-        # 2. The sentence avoids excessive use of difficult vocabulary that is not in the list of terms.
-        # 3. The sentence has absolutely correct grammar usage.
-        # 4. Most importantly, ensure that the sentence makes logical sense.
-        # 5. Lastly, the "Terms Used" must only contains terms from the provided list of terms. If the sentence follows all of the above rules but only fails this one, you may choose to remove the term from the "Terms Used" list and include the sentence in the final list.
-
-        # You must choose at least 5 sentences to keep, but can choose to keep all of them if they all properly follow the criteria above.
-        # Don't be scared to keep all 10 if they are all appropriate!
-
-        # Present your selected sentences in the same format as before, with no additional commentary."""
-
-        # # Second API call to select the best sentences
-        # second_response = anthropic.messages.create(
-        #     model="claude-3-5-sonnet-20240620",
-        #     max_tokens=500,
-        #     messages=[
-        #         {
-        #             "role": "user",
-        #             "content": first_prompt,
-        #         },
-        #         {
-        #             "role": "assistant",
-        #             "content": generated_text,
-        #         },
-        #         {
-        #             "role": "user",
-        #             "content": second_prompt,
-        #         },
-        #     ],
-        # )
-
-        # # Process the selected sentences
-        # generated_text = second_response.content[0].text
-        # print("second generation")
-        # print(generated_text)
-
-        # TODO: may have to do a manual check of terms used here.
         selected_sentences = []
         for entry in generated_text.strip().split("\n\n"):
-            if (
-                "Sentence:" in entry
-                and "Translation:" in entry
-                and "Terms used:" in entry
+            if all(
+                key in entry for key in ["Sentence:", "Translation:", "Terms used:"]
             ):
                 sentence_parts = entry.split("\n")
+                sentence = sentence_parts[0].split("Sentence:")[1].strip()
+                translation = sentence_parts[1].split("Translation:")[1].strip()
                 if user_lang_given:
-                    translation = sentence_parts[0].split("Sentence:")[1].strip()
-                    sentence = sentence_parts[1].split("Translation:")[1].strip()
-                else:
-                    sentence = sentence_parts[0].split("Sentence:")[1].strip()
-                    translation = sentence_parts[1].split("Translation:")[1].strip()
-                terms_used = sentence_parts[2].split("Terms used:")[1].strip()
+                    sentence, translation = translation, sentence
+
+                terms_used = {}
+                for term_pair in sentence_parts[2].split("Terms used:")[1].split("|||"):
+                    if ":::" in term_pair:
+                        term, definition = term_pair.split(":::")
+                        terms_used[term.strip()] = definition.strip()
+
+                new_terms = {}
+                if len(sentence_parts) > 3 and "New terms:" in sentence_parts[3]:
+                    for term_pair in (
+                        sentence_parts[3].split("New terms:")[1].split("|||")
+                    ):
+                        if ":::" in term_pair:
+                            term, definition = term_pair.split(":::")
+                            new_terms[term.strip()] = definition.strip()
+
                 selected_sentences.append(
                     {
                         "sentence": sentence,
                         "translation": translation,
                         "terms_used": terms_used,
+                        "new_terms": new_terms,
                     }
                 )
 
@@ -159,8 +121,13 @@ def generate_sentences(deck_id):
                 sentence=sentence["sentence"],
                 machine_translation=sentence["translation"],
                 terms_used=sentence["terms_used"],
+                new_terms=sentence["new_terms"],
             )
             db.session.add(new_sentence)
+            print("\nTerms Used:")
+            print(sentence["terms_used"])
+            print("\nNew terms:")
+            print(sentence["new_terms"])
         db.session.commit()
 
         return jsonify(
@@ -191,12 +158,12 @@ def translate_sentence(sentence_id):
     user_translation = data["translation"]
     terms_used = sentence.terms_used
 
-    if sentence.user_lang_given:
-        original_lang = deck.user_language
-        translated_lang = deck.deck_language
-    else:
-        original_lang = deck.deck_language
-        translated_lang = deck.user_language
+    original_lang = (
+        deck.user_language if sentence.user_lang_given else deck.deck_language
+    )
+    translated_lang = (
+        deck.deck_language if sentence.user_lang_given else deck.user_language
+    )
 
     prompt = f"""
         Your task is to evaluate my performance on a translation task.
@@ -211,27 +178,28 @@ def translate_sentence(sentence_id):
         {machine_translation}
 
         Terms used in this exercise:
-        {terms_used}
+        {json.dumps(terms_used, ensure_ascii=False, indent=2)}
 
         Please provide feedback based on the information provided above. Your feedback should consist of a rating and a review.
 
         Rating criteria:
         - Mainly based on accuracy of vocabulary and grammar
-        - Scale: 1 to 10, where:
-        1: Very Poor (no attempt given)
-        2-3: Poor (major errors in vocabulary and grammar)
+        - Scale: integer from 1 to 10, where:
+        0-1: Very Poor (no attempt given)
+        2-3: Poor (major errors in both vocabulary AND grammar)
         4-5: Fair (some significant errors, but a good attempt and partially correct)
-        6-8: Good (minor errors, mostly accurate)
-        9: Excellent (very negligible errors)
-        10: Perfect (fully accurate in meaning and grammar)
+        6-7: Good (some errors, but the meaning gets across)
+        8: Very Good (minor errors and mostly accurate)
+        9: Excellent (extremely minor errors)
+        10: Perfect (fully accurate in meaning and grammar, with negligible errors)
 
         Review guidelines:
         - Evaluate my translation primarily based on how well it conveys the meaning of the original sentence
         - My translation can use different words or grammatical structures as long as the meaning is preserved
         - When referencing the machine translation, only mention specific words or phrases that are actually present in it
         - Do not claim that the machine translation used certain words or structures unless you can directly quote them
-        - Highlight both strengths and areas for improvement in my translation
-        - Provide specific feedback on any grammatical, spelling, or logical errors you can identify
+        - Highlight areas for improvement in my translation
+        - Provide specific feedback on any grammatical, spelling, vocabulary, or logical errors you can identify
         - If my translation is different from the machine translation but still accurate and appropriate, reflect this positively
         - IMPORTANT: Use the exact terms provided in the "Terms used" section. Do not suggest alternative translations for these terms.
 
@@ -240,34 +208,25 @@ def translate_sentence(sentence_id):
         Rating: {{number from 1 to 10}}
         Review: {{brief and concise review of the translation, focusing on accuracy, grammar, and any necessary improvements}}
 
+        The review should be 2 or 3 sentences maximum, only going over this limit if ABSOLUTELY necessary.
         Note: If my translation is perfectly accurate and grammatically correct, don't hesitate to give a 10!
 
         IMPORTANT:
-        1. When discussing the machine translation, only reference words or phrases that are explicitly present in it.
-        2. Focus on evaluating my translation's accuracy in conveying the original meaning, not on matching the machine translation exactly.
-        3. Keep the reviews short and concise, ensuring that there are no unnecessary details or elaborations.
+        1. Keep the reviews short and concise, avoiding unnecessary elaboration.
+        2. Focus on evaluating my translation's accuracy of expressing the original meaning, not on matching the machine translation exactly.
+        3. When discussing the machine translation, PLEASE ONLY reference words or phrases that are explicitly present in it.
         4. Provide ONLY the Rating and Review in the specified format. Do not include any other text or explanations.
         """
+
     try:
         message = anthropic.messages.create(
             model="claude-3-5-sonnet-20240620",
             max_tokens=300,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt,
-                        }
-                    ],
-                }
-            ],
+            messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
         )
 
         evaluation = message.content[0].text
 
-        # Parse the evaluation
         rating_match = re.search(r"Rating: (\d+)", evaluation)
         text_match = re.search(r"Review: (.+)", evaluation, re.DOTALL)
 

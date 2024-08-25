@@ -1,5 +1,6 @@
 from src import db
 from datetime import datetime
+import json
 
 
 class User(db.Model):
@@ -63,18 +64,34 @@ class GeneratedSentence(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     deck_id = db.Column(db.Integer, db.ForeignKey("decks.deck_id"), nullable=False)
-    # If the sentence you need to translate is in user_lang
     user_lang_given = db.Column(db.Boolean, nullable=False)
     sentence = db.Column(db.Text, nullable=False)
     machine_translation = db.Column(db.Text, nullable=False)
-    terms_used = db.Column(db.Text, nullable=False)
+    terms_used_json = db.Column(db.Text, nullable=False, default="{}")
+    new_terms_json = db.Column(db.Text, nullable=False, default="{}")
     user_translation = db.Column(db.Text)
     evaluation_rating = db.Column(db.Integer)
     evaluation_text = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationship
     deck = db.relationship("Deck", back_populates="generated_sentences")
+
+    @property
+    def terms_used(self):
+        return json.loads(self.terms_used_json)
+
+    @terms_used.setter
+    def terms_used(self, value):
+        self.terms_used_json = json.dumps(value)
+
+    @property
+    def new_terms(self):
+        return json.loads(self.new_terms_json)
+
+    @new_terms.setter
+    def new_terms(self, value):
+        self.new_terms_json = json.dumps(value)
 
     def __repr__(self):
         return f"<GeneratedSentence {self.sentence[:20]}...>"
@@ -88,7 +105,8 @@ class ArchivedSentence(db.Model):
     user_lang_given = db.Column(db.Boolean, nullable=False)
     sentence = db.Column(db.Text, nullable=False)
     machine_translation = db.Column(db.Text, nullable=False)
-    terms_used = db.Column(db.Text, nullable=False)
+    terms_used_json = db.Column(db.Text, nullable=False, default="{}")
+    new_terms_json = db.Column(db.Text, nullable=False, default="{}")
     user_translation = db.Column(db.Text)
     evaluation_rating = db.Column(db.Integer)
     evaluation_text = db.Column(db.Text)
@@ -96,6 +114,22 @@ class ArchivedSentence(db.Model):
 
     # Relationships
     deck = db.relationship("Deck", back_populates="archived_sentences")
+
+    @property
+    def terms_used(self):
+        return json.loads(self.terms_used_json)
+
+    @terms_used.setter
+    def terms_used(self, value):
+        self.terms_used_json = json.dumps(value)
+
+    @property
+    def new_terms(self):
+        return json.loads(self.new_terms_json)
+
+    @new_terms.setter
+    def new_terms(self, value):
+        self.new_terms_json = json.dumps(value)
 
     def __repr__(self):
         return f"<ArchivedSentence {self.sentence[:20]}...>"

@@ -8,8 +8,7 @@ const RatingBar = ({ rating }) => {
     if (rating >= 9) return 'Excellent';
     if (rating >= 8) return 'Very Good';
     if (rating >= 6) return 'Good';
-    if (rating >= 5) return 'Fair';
-    if (rating >= 4) return 'Needs Work';
+    if (rating >= 4) return 'Fair';
     if (rating >= 2) return 'Poor';
     if (rating >= 0) return 'Very Poor';
     return 'Null';
@@ -20,8 +19,7 @@ const RatingBar = ({ rating }) => {
     if (rating >= 9) return '#00ff00'; // Green
     if (rating >= 8) return '#7eff80';  // Light Green
     if (rating >= 6) return '#beff7f';  // Yellow-Green
-    if (rating >= 5) return '#feff7f';  // Yellow
-    if (rating >= 4) return '#ffdf80';  // Orange
+    if (rating >= 4) return '#feff7f';  // Yellow
     if (rating >= 2) return '#ffbf7f';  // Deep Orange
     if (rating >= 0) return '#ff7f7e';  // Red
     return '#bbb';

@@ -7,6 +7,7 @@ import './SentencePage.css';
 export default function SentencePage() {
   const [sentences, setSentences] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showHint, setShowHint] = useState(false);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
@@ -54,6 +55,7 @@ export default function SentencePage() {
     }
   };
 
+
   const findFirstUntranslatedIndex = (sentences) => {
     const index = sentences.findIndex(sentence => !sentence.user_translation);
     return index !== -1 ? index : 0;
@@ -71,12 +73,18 @@ export default function SentencePage() {
     setCurrentIndex((prevIndex) => 
       prevIndex > 0 ? prevIndex - 1 : sentences.length - 1
     );
+    setShowHint(false);  // Reset hint when changing sentences
   };
 
   const goToNext = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex < sentences.length - 1 ? prevIndex + 1 : 0
     );
+    setShowHint(false);  // Reset hint when changing sentences
+  };
+
+  const handleToggleHint = () => {
+    setShowHint(prevShowHint => !prevShowHint);
   };
 
   const handleSentenceCountChange = (e) => {
@@ -170,6 +178,8 @@ export default function SentencePage() {
           <SentenceCard 
             sentence={currentSentence}
             onSentenceUpdate={handleSentenceUpdate}
+            showHint={showHint}
+            onToggleHint={handleToggleHint}
           />
           
           <div className="slideshow-controls">
