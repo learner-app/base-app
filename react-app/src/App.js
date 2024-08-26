@@ -5,6 +5,7 @@ import DeckPage from './pages/DeckPage';
 import SentencePage from './pages/SentencePage';
 import NewUserPage from './pages/NewUserPage';
 import ReviewSentencesPage from './pages/ReviewSentencesPage';
+import AnkiPage from './pages/AnkiPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/deck/:deckId" element={<DeckPage />} />
           <Route path="/deck/:deckId/sentences" element={<SentencePage />} />
           <Route path="/deck/:deckId/review" element={<ReviewSentencesPage />} />
+          <Route path="/deck/:deckId/anki" element={<AnkiPage />} />
         </Routes>
       </div>
     </Router>

@@ -35,6 +35,8 @@ def generate_sentences(deck_id):
     print("\Key Terms")
     print(emphasized_terms_list)
 
+    all_term_set = {term.term.lower() for term in all_terms}
+
     first_prompt = f"""You are an expert language tutor creating practice sentences for a student learning {deck.deck_language}. Their native language is {deck.user_language}.
     Here is a list of terms and their definitions that the student is learning:
 
@@ -44,14 +46,13 @@ def generate_sentences(deck_id):
     Your task is to create {sentence_count} example {deck.deck_language} sentences and their {deck.user_language} translations, each focusing on one of the Key Terms. Follow these guidelines:
 
     1. Create one sentence for each of the Key Terms in order. Each sentence should primarily demonstrate the usage of its assigned Key Term.
-    2. You can and are encouraged to use the Contextual Terms and other Key Terms to create more natural sentences and provide context, but the main focus should be on the assigned Key Term for each sentence.
-    3. IMPORTANT: Use the exact terms and definitions provided in the term list. Do not use synonyms or alternative phrasings for these terms.
-    4. Refrain from using complex vocabulary or grammar that is not in the term list. However, you may use common words known to beginners. You may also occasionally use more complicated sentence structures.
+    2. You can and are encouraged to use the Contextual Terms and other Key Terms to create more natural sentences and provide context.
+    3. IMPORTANT: Use the exact terms and definitions provided in the term list. Do not use synonyms or alternative phrasings.
+    4. Refrain from using complex vocabulary or grammar that is not in the term list. You may use beginner vocabulary and occasionally more complicated sentence structures.
     5. Ensure both the {deck.deck_language} sentences and their {deck.user_language} translations are grammatically correct.
     6. Create sentences that are natural and suitable for everyday conversations and practical scenarios.
     7. Only use more than one sentence for your example when absolutely necessary.
-    8. After each sentence, list only the Contextual and Key Terms used in that sentence, with the Key Term listed first. Ensure that the terms you include are actually in the list of terms above and are used in their exact form.
-    9. Most importantly, ensure that the sentence generated makes complete logical sense.
+    8. Most importantly, ensure that the sentence generated makes complete logical sense.
 
     Present your examples in this format:
     Sentence: {{example sentence in {deck.deck_language}}}
@@ -59,12 +60,13 @@ def generate_sentences(deck_id):
     Terms used: {{term1}} ::: {{definition1}} ||| {{term2}} ::: {{definition2}} ||| ...
     New terms: {{new_term1}} ::: {{new_definition1}} ||| {{new_term2}} ::: {{new_definition2}} ||| ...
 
+    You must start the list of "Terms used" for each sentence with its corresponding Key Term. Terms in "Terms used" must ALWAYS exist in the list of Contextual and Key Terms provided above.
     New terms should consist of any non-beginner vocabulary AND all non-beginner grammatical phrases, conjugations, or particles that are used in the example sentence, but not included within the list of provided terms.
     If there are no new terms, keep "New terms:" and nothing afterwards.
 
     Remember:
     1. Each sentence should focus primarily on its assigned Key Term.
-    2. Always use the exact terms from the provided list, and be sure to include them in the "Terms used" output. Do not substitute them with synonyms or rephrase them.
+    2. Always use the exact terms from the provided lists of terms, and include them in the "Terms used" output. Do not substitute them with synonyms or rephrase them.
     3. Ensure the sentences are logical, sensical, and GRAMATICALLY CORRECT.
     4. Provide ONLY the examples in the specified format, with no additional commentary."""
 
@@ -91,19 +93,27 @@ def generate_sentences(deck_id):
                     sentence, translation = translation, sentence
 
                 terms_used = {}
+                new_terms = {}
                 for term_pair in sentence_parts[2].split("Terms used:")[1].split("|||"):
                     if ":::" in term_pair:
                         term, definition = term_pair.split(":::")
-                        terms_used[term.strip()] = definition.strip()
+                        term = term.strip()
+                        definition = definition.strip()
+                        if term.lower() in all_term_set:
+                            terms_used[term] = definition
+                        else:
+                            new_terms[term] = definition
 
-                new_terms = {}
                 if len(sentence_parts) > 3 and "New terms:" in sentence_parts[3]:
                     for term_pair in (
                         sentence_parts[3].split("New terms:")[1].split("|||")
                     ):
                         if ":::" in term_pair:
                             term, definition = term_pair.split(":::")
-                            new_terms[term.strip()] = definition.strip()
+                            term = term.strip()
+                            definition = definition.strip()
+                            if term.lower() not in all_term_set:
+                                new_terms[term] = definition
 
                 selected_sentences.append(
                     {
@@ -124,10 +134,6 @@ def generate_sentences(deck_id):
                 new_terms=sentence["new_terms"],
             )
             db.session.add(new_sentence)
-            print("\nTerms Used:")
-            print(sentence["terms_used"])
-            print("\nNew terms:")
-            print(sentence["new_terms"])
         db.session.commit()
 
         return jsonify(
@@ -207,7 +213,7 @@ def translate_sentence(sentence_id):
         The review should be 2 or 3 sentences maximum, only going over this limit if ABSOLUTELY necessary.
         Note: My translation could be better than or have slight variations from the machine translation. 
         If my translation is accurate in meaning and grammatically correct, please give me a 10.
-        Additionally, if there are minor variations of language that don't affect the overall accuracy, please still give me a 10.
+        Additionally, if there are variations of language that don't affect the overall accuracy, please still give me a 10.
 
         IMPORTANT:
         1. Keep the reviews short and concise.

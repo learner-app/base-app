@@ -1,0 +1,145 @@
+.anki-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.anki-deck__title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+  
+.anki-deck__progress {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #666;
+}
+  
+.anki-deck__card {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+  
+.anki-deck__term {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #495057;
+}
+  
+.anki-deck__definition {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #495057;
+}
+  
+.anki-deck__rating-buttons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+  
+.anki-deck__rating-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    flex: 1;
+    margin: 0 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.anki-deck__rating-button:hover {
+    transform: translateY(-2px);
+}
+  
+.anki-deck__rating-button--again { background-color: #ff7f7e; color: black; }
+.anki-deck__rating-button--hard { background-color: #ffbf7f; color: black; }
+.anki-deck__rating-button--good { background-color: #7eff80; color: black; }
+.anki-deck__rating-button--easy { background-color: #7fffff; color: black; }
+  
+.anki-deck__next-interval {
+    font-size: 12px;
+    margin-top: 5px;
+}
+  
+.anki-deck__show-answer-button {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #54a0ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 16px;
+    font-weight: bold;
+}
+  
+.anki-deck__show-answer-button:hover {
+    background-color: #2e86de;
+}
+  
+.anki-deck__complete {
+    text-align: center;
+    margin-top: 40px;
+}
+  
+.anki-deck__complete-message {
+    font-size: 18px;
+    color: #495057;
+    margin-bottom: 20px;
+}
+  
+.anki-deck__reset-button {
+    padding: 10px 20px;
+    background-color: #54a0ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 16px;
+    font-weight: bold;
+}
+  
+.anki-deck__reset-button:hover {
+    background-color: #2e86de;
+}
+  
+.back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 16px;
+}
+  
+.back-button:hover {
+    text-decoration: underline;
+}
+  
+  
+.anki-deck__back-link:hover {
+    text-decoration: underline;
+}
+  
+.anki-deck__loading,
+.anki-deck__no-cards {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    margin-top: 40px;
+}
