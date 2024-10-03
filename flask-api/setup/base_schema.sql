@@ -60,7 +60,34 @@ CREATE TABLE archived_sentences (
     FOREIGN KEY (deck_id) REFERENCES decks(deck_id)
 );
 
--- Indexes for faster lookups
+-- Create a new table for user-specific term data
+CREATE TABLE user_term_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    term_id INTEGER NOT NULL,
+    last_reviewed TIMESTAMP,
+    next_review TIMESTAMP,
+    ease_factor REAL DEFAULT 2.5,
+    interval INTEGER DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (term_id) REFERENCES terms(term_id),
+    UNIQUE(user_id, term_id)
+);
+
+-- Create a new table for review history
+CREATE TABLE review_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    term_id INTEGER NOT NULL,
+    review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    rating INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (term_id) REFERENCES terms(term_id)
+);
+
+-- Create indexes for faster lookups
+CREATE INDEX idx_user_term_data ON user_term_data(user_id, term_id);
+CREATE INDEX idx_review_history ON review_history(user_id, term_id);
 CREATE INDEX idx_archived_sentence_deck ON archived_sentences(deck_id);
 CREATE INDEX idx_generated_sentence_deck ON generated_sentences(deck_id);
 CREATE INDEX idx_deck_user ON decks(user_id);

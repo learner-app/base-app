@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import desc
 from src import db
-from src.models import Deck, User, Term
+from src.models import ArchivedSentence, Deck, GeneratedSentence, User, Term
 
 decks_bp = Blueprint("decks", __name__)
 
@@ -127,8 +127,21 @@ def delete_deck(deck_id):
     # Delete associated terms
     Term.query.filter_by(deck_id=deck_id).delete()
 
+    # Delete associated generated sentences
+    GeneratedSentence.query.filter_by(deck_id=deck_id).delete()
+
+    # Delete associated archived sentences
+    ArchivedSentence.query.filter_by(deck_id=deck_id).delete()
+
     # Delete the deck
     db.session.delete(deck)
     db.session.commit()
 
-    return jsonify({"message": f"Deck {deck_id} and its terms have been deleted"}), 200
+    return (
+        jsonify(
+            {
+                "message": f"Deck {deck_id}, its terms, and associated sentences have been deleted"
+            }
+        ),
+        200,
+    )

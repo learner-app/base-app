@@ -37,13 +37,14 @@ INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '-(으)면 -(으
 INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '사과', 'apple');
 INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '-(으)ㄹ 까요', 'should we _?');
 INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '영화', 'movie');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '학생', 'student');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '편안', 'peace');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '느끼다', 'to feel');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '배고파다', 'to be hungry');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '계획', 'plan');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '노래방', 'noraebang / karaoke');
-INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '받다', 'to receive, to get');
 EOF
 
 echo "Database setup complete"
+
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '학생', 'student');
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '편안', 'peace');
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '느끼다', 'to feel');
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '배고파다', 'to be hungry');
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '계획', 'plan');
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '노래방', 'noraebang / karaoke');
+# INSERT INTO terms (deck_id, term, definition) VALUES ($DECK_ID, '받다', 'to receive, to get');
